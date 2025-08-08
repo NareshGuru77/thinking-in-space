@@ -10,3 +10,6 @@
 [submodule "transformers"]
 	path = transformers
 	url = git@github.com:huggingface/transformers.git
+[submodule "Emu3"]
+	path = Emu3
+	url = https://github.com/baaivision/Emu3.git
