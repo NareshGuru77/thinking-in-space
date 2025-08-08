@@ -133,7 +133,7 @@ for model in "${models[@]}"; do
         ;;
     "baai_video_xl2")
         model_family="baai_video_xl2"
-        model_args="pretrained=BAAI/Video-XL-2"
+        model_args=""
         num_processes=1
         ;;
     *)

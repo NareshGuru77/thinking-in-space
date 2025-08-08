@@ -147,8 +147,10 @@ class BAAIVideoXL2(lmms):
             sample_fps = None  # uniform sampling
             max_sample_fps = None
 
-            gen_kwargs.update({"do_sample": False, "temperature": 0.01, "top_p": 0.001, "num_beams": 1,
-                               "use_cache": True, "max_new_tokens": 128})
+            # gen_kwargs.update({"do_sample": False, "temperature": 0.01, "top_p": 0.001, "num_beams": 1,
+            #                    "use_cache": True, "max_new_tokens": 128})
+            gen_kwargs = {"do_sample": False, "temperature": 0.01, "top_p": 0.001, "num_beams": 1,
+                               "use_cache": True, "max_new_tokens": 128}
             with torch.inference_mode():
                 response = self.model.chat(video_path, self.tokenizer, question1, chat_history=None,
                                            return_history=False, max_num_frames=max_num_frames, sample_fps=sample_fps,
