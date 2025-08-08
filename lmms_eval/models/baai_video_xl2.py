@@ -18,14 +18,10 @@ from transformers import AutoModelForCausalLM, AutoTokenizer,  AutoModel, AutoIm
 
 @register_model("EMU3")
 class BAAIVideoXL2(lmms):
-    """
-    EMU3 Model
-    https://github.com/baaivision/Emu3
-    """
 
     def __init__(
         self,
-        pretrained: str = "BAAI/Emu3-Chat",
+        pretrained: str = "/root/Models/Video-XL-2",
         device: Optional[str] = "cuda",
         batch_size: Optional[Union[int, str]] = 1,
         trust_remote_code: Optional[bool] = True,
