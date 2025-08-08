@@ -21,7 +21,7 @@ class BAAIVideoXL2(lmms):
 
     def __init__(
         self,
-        pretrained: str = "/root/Models/Video-XL-2",
+        pretrained: str = "BAAI/Video-XL-2",
         device: Optional[str] = "cuda",
         batch_size: Optional[Union[int, str]] = 1,
         trust_remote_code: Optional[bool] = True,
