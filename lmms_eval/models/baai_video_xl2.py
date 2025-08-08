@@ -55,7 +55,7 @@ class BAAIVideoXL2(lmms):
         }
         self.model.config.prefill_config = prefill_config
 
-        self._tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+        self._tokenizer = AutoTokenizer.from_pretrained(pretrained, trust_remote_code=True)
         # self.tokenizer.padding_side = "left"
         # self.tokenizer.pad_token_id = self.tokenizer.eod_id
 
@@ -105,15 +105,6 @@ class BAAIVideoXL2(lmms):
     def eot_token_id(self):
         # we use EOT because end of *text* is more accurate for what we're doing than end of *sentence*
         return self.tokenizer.eod_id
-
-    @property
-    def max_length(self):
-        return self._max_length
-
-    # should be deleted since max_new_tokens is decided by gen_kwargs not a model property
-    # @property
-    # def max_new_tokens(self) -> int:
-    #     return 256
 
     @property
     def batch_size(self):
