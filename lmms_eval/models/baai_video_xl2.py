@@ -143,7 +143,8 @@ class BAAIVideoXL2(lmms):
             question1 = contexts
 
             # params
-            max_num_frames = 1300
+            # TODO: what is the effect of num frames ? Changing from 1300 to 130
+            max_num_frames = 130
             sample_fps = None  # uniform sampling
             max_sample_fps = None
 
