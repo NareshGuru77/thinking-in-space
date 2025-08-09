@@ -16,12 +16,12 @@ from loguru import logger as eval_logger
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
-@register_model("BAAIVideoXL2")
-class BAAIVideoXL2(lmms):
+@register_model("VideoChatQwen")
+class VideoChatQwen(lmms):
 
     def __init__(
         self,
-        pretrained: str = "BAAI/Video-XL-2",
+        pretrained: str = "OpenGVLab/VideoChat-Flash-Qwen2_5-2B_res448",
         device: Optional[str] = "cuda",
         batch_size: Optional[Union[int, str]] = 1,
         trust_remote_code: Optional[bool] = True,
@@ -39,21 +39,20 @@ class BAAIVideoXL2(lmms):
             self._device = device
         # load model
         self._model = AutoModelForCausalLM.from_pretrained(
-            pretrained, trust_remote_code=True, device_map=device,quantization_config=None,
-            attn_implementation="sdpa", torch_dtype=torch.float16, low_cpu_mem_usage=True) # sdpa
-        self.model.config.enable_chunk_prefill = True
-        prefill_config = {
-            'chunk_prefill_mode': 'streaming',
-            'chunk_size': 4,
-            'step_size': 1,
-            'offload': True,
-            'chunk_size_for_vision_tower': 24,
-        }
-        self.model.config.prefill_config = prefill_config
+            pretrained, trust_remote_code=True).to(torch.bfloat16).cuda()
 
         self._tokenizer = AutoTokenizer.from_pretrained(pretrained, trust_remote_code=True)
         # self.tokenizer.padding_side = "left"
         # self.tokenizer.pad_token_id = self.tokenizer.eod_id
+
+        mm_llm_compress = False  # use the global compress or not
+        if mm_llm_compress:
+            self.model.config.mm_llm_compress = True
+            self.model.config.llm_compress_type = "uniform0_attention"
+            self.model.config.llm_compress_layer_list = [4, 18]
+            self.model.config.llm_image_token_ratio_list = [1, 0.75, 0.25]
+        else:
+            self.model.config.mm_llm_compress = False
 
         # TODO: check prompt template
         self.prompt = "<img>{}</img>{}"
@@ -142,23 +141,23 @@ class BAAIVideoXL2(lmms):
             video_path = visuals[0]
             question1 = contexts
 
-            # params
-            max_num_frames = 1300
-            sample_fps = None  # uniform sampling
-            max_sample_fps = None
+            # evaluation setting
+            max_num_frames = 512
+            generation_config = dict(
+                do_sample=False,
+                temperature=0.0,
+                max_new_tokens=1024,
+                top_p=0.1,
+                num_beams=1
+            )
 
-            # gen_kwargs.update({"do_sample": False, "temperature": 0.01, "top_p": 0.001, "num_beams": 1,
-            #                    "use_cache": True, "max_new_tokens": 128})
-            gen_kwargs = {"do_sample": False, "temperature": 0.01, "top_p": 0.001, "num_beams": 1,
-                               "use_cache": True, "max_new_tokens": 128}
             with torch.inference_mode():
-                response = self.model.chat(video_path, self.tokenizer, question1, chat_history=None,
-                                           return_history=False, max_num_frames=max_num_frames, sample_fps=sample_fps,
-                                           max_sample_fps=max_sample_fps, generation_config=gen_kwargs)
+                # single-turn conversation
+                response, chat_history = self.model.chat(
+                    video_path=video_path, tokenizer=self.tokenizer, user_prompt=question1,
+                    return_history=True, max_num_frames=max_num_frames, generation_config=generation_config)
+                print(response)
 
-            peak_memory_allocated = torch.cuda.max_memory_allocated()
-            print(f"Memory Peak: {peak_memory_allocated / (1024 ** 3):.2f} GB")
-            print(response)
             res.append(response)
             pbar.update(1)
 

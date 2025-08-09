@@ -44,6 +44,7 @@ AVAILABLE_MODELS = {
     "xcomposer2d5": "XComposer2D5",
     "qwen2vl": "Qwen2VL",
     "baai_video_xl2": "BAAIVideoXL2",
+    "videochat_flash_qwen_2_5": "VideoChatQwen"
 }
 
 

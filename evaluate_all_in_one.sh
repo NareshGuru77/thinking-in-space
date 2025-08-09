@@ -18,7 +18,7 @@ num_processes=4
 num_frames=32
 launcher=accelerate
 
-available_models="llava_one_vision_qwen2_0p5b_ov_32f,llava_one_vision_qwen2_7b_ov_32f,llava_next_video_7b_qwen2_32f,llama3_vila1p5_8b_32f,llama3_longvila_8b_128frames_32f,longva_7b_32f,internvl2_2b_8f,internvl2_8b_8f, baai_video_xl2"
+available_models="llava_one_vision_qwen2_0p5b_ov_32f,llava_one_vision_qwen2_7b_ov_32f,llava_next_video_7b_qwen2_32f,llama3_vila1p5_8b_32f,llama3_longvila_8b_128frames_32f,longva_7b_32f,internvl2_2b_8f,internvl2_8b_8f, baai_video_xl2, videochat_flash_qwen_2_5"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -134,6 +134,11 @@ for model in "${models[@]}"; do
     "baai_video_xl2")
         model_family="baai_video_xl2"
         model_args="pretrained=BAAI/Video-XL-2"
+        num_processes=1
+        ;;
+    "videochat_flash_qwen_2_5")
+        model_family="videochat_flash_qwen_2_5"
+        model_args="pretrained=OpenGVLab/VideoChat-Flash-Qwen2_5-2B_res448"
         num_processes=1
         ;;
     *)
